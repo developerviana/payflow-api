@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: payflow-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: payflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    networks:
+      - payflow-network
+
+  # Serviço da aplicação (opcional para desenvolvimento)
+  app:
+    build: .
+    container_name: payflow-api
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=payflow
+      - SERVER_PORT=8080
+    depends_on:
+      - postgres
+    networks:
+      - payflow-network
+    profiles:
+      - full # Use: docker-compose --profile full up
+
+volumes:
+  postgres_data:
+
+networks:
+  payflow-network:
+    driver: bridge
