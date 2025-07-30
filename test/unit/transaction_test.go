@@ -1,10 +1,9 @@
-package entity
+package entity_test
 
 import (
 	"testing"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"payflow-api/internal/entity"
 )
 
@@ -90,24 +89,24 @@ func TestNewTransaction(t *testing.T) {
 
 func TestTransaction_ValidateBusinessRules(t *testing.T) {
 	// Criar usuários para teste
-	commonUser, _ := NewUser("João Silva", "11144477735", "joao@teste.com", "123456", UserTypeCommon)
-	merchantUser, _ := NewUser("Empresa LTDA", "11222333000181", "empresa@teste.com", "123456", UserTypeMerchant)
-	commonUser2, _ := NewUser("Maria Silva", "22244477735", "maria@teste.com", "123456", UserTypeCommon)
+	commonUser, _ := entity.NewUser("João Silva", "11144477735", "joao@teste.com", "123456", entity.UserTypeCommon)
+	merchantUser, _ := entity.NewUser("Empresa LTDA", "11222333000181", "empresa@teste.com", "123456", entity.UserTypeMerchant)
+	commonUser2, _ := entity.NewUser("Maria Silva", "22244477735", "maria@teste.com", "123456", entity.UserTypeCommon)
 	
 	// Adicionar saldo ao usuário comum
 	commonUser.CreditBalance(decimal.NewFromFloat(500.00))
 	
 	tests := []struct {
 		name        string
-		transaction *Transaction
-		payer       *User
-		payee       *User
+		transaction *entity.Transaction
+		payer       *entity.User
+		payee       *entity.User
 		expectError bool
 		errorMsg    string
 	}{
 		{
 			name: "Valid transaction between common users",
-			transaction: &Transaction{
+			transaction: &entity.Transaction{
 				PayerID: commonUser.ID,
 				PayeeID: commonUser2.ID,
 				Amount:  decimal.NewFromFloat(100.00),
@@ -118,7 +117,7 @@ func TestTransaction_ValidateBusinessRules(t *testing.T) {
 		},
 		{
 			name: "Valid transaction from common to merchant",
-			transaction: &Transaction{
+			transaction: &entity.Transaction{
 				PayerID: commonUser.ID,
 				PayeeID: merchantUser.ID,
 				Amount:  decimal.NewFromFloat(100.00),
@@ -129,7 +128,7 @@ func TestTransaction_ValidateBusinessRules(t *testing.T) {
 		},
 		{
 			name: "Invalid transaction - merchant as payer",
-			transaction: &Transaction{
+			transaction: &entity.Transaction{
 				PayerID: merchantUser.ID,
 				PayeeID: commonUser.ID,
 				Amount:  decimal.NewFromFloat(100.00),
@@ -141,7 +140,7 @@ func TestTransaction_ValidateBusinessRules(t *testing.T) {
 		},
 		{
 			name: "Invalid transaction - insufficient balance",
-			transaction: &Transaction{
+			transaction: &entity.Transaction{
 				PayerID: commonUser.ID,
 				PayeeID: commonUser2.ID,
 				Amount:  decimal.NewFromFloat(1000.00),
@@ -153,7 +152,7 @@ func TestTransaction_ValidateBusinessRules(t *testing.T) {
 		},
 		{
 			name: "Invalid transaction - same user",
-			transaction: &Transaction{
+			transaction: &entity.Transaction{
 				PayerID: commonUser.ID,
 				PayeeID: commonUser.ID,
 				Amount:  decimal.NewFromFloat(100.00),
@@ -182,7 +181,7 @@ func TestTransaction_ValidateBusinessRules(t *testing.T) {
 }
 
 func TestTransaction_StatusMethods(t *testing.T) {
-	transaction, _ := NewTransaction("payer-123", "payee-456", decimal.NewFromFloat(100.00))
+	transaction, _ := entity.NewTransaction("payer-123", "payee-456", decimal.NewFromFloat(100.00))
 	
 	// Estado inicial
 	assert.True(t, transaction.IsPending())
@@ -195,40 +194,40 @@ func TestTransaction_StatusMethods(t *testing.T) {
 	transaction.Authorize("auth-123")
 	assert.False(t, transaction.IsPending())
 	assert.True(t, transaction.IsAuthorized())
-	assert.Equal(t, TransactionStatusAuthorized, transaction.Status)
+	assert.Equal(t, entity.TransactionStatusAuthorized, transaction.Status)
 	assert.Equal(t, "auth-123", *transaction.AuthorizationID)
 	
 	// Completar transação
 	transaction.Complete()
 	assert.False(t, transaction.IsAuthorized())
 	assert.True(t, transaction.IsCompleted())
-	assert.Equal(t, TransactionStatusCompleted, transaction.Status)
+	assert.Equal(t, entity.TransactionStatusCompleted, transaction.Status)
 	assert.NotNil(t, transaction.CompletedAt)
 }
 
 func TestTransaction_FailAndReverse(t *testing.T) {
-	transaction, _ := NewTransaction("payer-123", "payee-456", decimal.NewFromFloat(100.00))
+	transaction, _ := entity.NewTransaction("payer-123", "payee-456", decimal.NewFromFloat(100.00))
 	
 	// Falhar transação
 	transaction.Fail("Autorização negada")
 	assert.True(t, transaction.IsFailed())
-	assert.Equal(t, TransactionStatusFailed, transaction.Status)
+	assert.Equal(t, entity.TransactionStatusFailed, transaction.Status)
 	assert.Equal(t, "Autorização negada", *transaction.FailureReason)
 	
 	// Criar nova transação para testar reversão
-	transaction2, _ := NewTransaction("payer-123", "payee-456", decimal.NewFromFloat(100.00))
+	transaction2, _ := entity.NewTransaction("payer-123", "payee-456", decimal.NewFromFloat(100.00))
 	transaction2.Authorize("auth-123")
 	transaction2.Complete()
 	
 	// Reverter transação
 	transaction2.Reverse("Chargeback solicitado")
 	assert.True(t, transaction2.IsReversed())
-	assert.Equal(t, TransactionStatusReversed, transaction2.Status)
+	assert.Equal(t, entity.TransactionStatusReversed, transaction2.Status)
 	assert.Equal(t, "Chargeback solicitado", *transaction2.FailureReason)
 }
 
 func TestTransaction_CanBeMethods(t *testing.T) {
-	transaction, _ := NewTransaction("payer-123", "payee-456", decimal.NewFromFloat(100.00))
+	transaction, _ := entity.NewTransaction("payer-123", "payee-456", decimal.NewFromFloat(100.00))
 	
 	// Estado inicial - pendente
 	assert.True(t, transaction.CanBeAuthorized())
@@ -248,7 +247,7 @@ func TestTransaction_CanBeMethods(t *testing.T) {
 	assert.True(t, transaction.CanBeReversed())
 	
 	// Falhada
-	transaction2, _ := NewTransaction("payer-123", "payee-456", decimal.NewFromFloat(100.00))
+	transaction2, _ := entity.NewTransaction("payer-123", "payee-456", decimal.NewFromFloat(100.00))
 	transaction2.Fail("Erro")
 	assert.False(t, transaction2.CanBeAuthorized())
 	assert.False(t, transaction2.CanBeCompleted())
@@ -256,7 +255,7 @@ func TestTransaction_CanBeMethods(t *testing.T) {
 }
 
 func TestTransaction_MarkNotificationSent(t *testing.T) {
-	transaction, _ := NewTransaction("payer-123", "payee-456", decimal.NewFromFloat(100.00))
+	transaction, _ := entity.NewTransaction("payer-123", "payee-456", decimal.NewFromFloat(100.00))
 	
 	assert.False(t, transaction.NotificationSent)
 	
@@ -265,17 +264,17 @@ func TestTransaction_MarkNotificationSent(t *testing.T) {
 }
 
 func TestTransaction_GetStatusDescription(t *testing.T) {
-	transaction, _ := NewTransaction("payer-123", "payee-456", decimal.NewFromFloat(100.00))
+	transaction, _ := entity.NewTransaction("payer-123", "payee-456", decimal.NewFromFloat(100.00))
 	
 	tests := []struct {
-		status      TransactionStatus
+		status      entity.TransactionStatus
 		description string
 	}{
-		{TransactionStatusPending, "Pendente"},
-		{TransactionStatusAuthorized, "Autorizada"},
-		{TransactionStatusCompleted, "Concluída"},
-		{TransactionStatusFailed, "Falhou"},
-		{TransactionStatusReversed, "Revertida"},
+		{entity.TransactionStatusPending, "Pendente"},
+		{entity.TransactionStatusAuthorized, "Autorizada"},
+		{entity.TransactionStatusCompleted, "Concluída"},
+		{entity.TransactionStatusFailed, "Falhou"},
+		{entity.TransactionStatusReversed, "Revertida"},
 	}
 
 	for _, tt := range tests {
@@ -287,15 +286,15 @@ func TestTransaction_GetStatusDescription(t *testing.T) {
 }
 
 func TestTransaction_GetAmountFormatted(t *testing.T) {
-	transaction, _ := NewTransaction("payer-123", "payee-456", decimal.NewFromFloat(123.45))
+	transaction, _ := entity.NewTransaction("payer-123", "payee-456", decimal.NewFromFloat(123.45))
 	assert.Equal(t, "R$ 123.45", transaction.GetAmountFormatted())
 	
-	transaction2, _ := NewTransaction("payer-123", "payee-456", decimal.NewFromFloat(1000.00))
+	transaction2, _ := entity.NewTransaction("payer-123", "payee-456", decimal.NewFromFloat(1000.00))
 	assert.Equal(t, "R$ 1000.00", transaction2.GetAmountFormatted())
 }
 
 func TestTransaction_ToCreateTransactionResponse(t *testing.T) {
-	transaction, _ := NewTransaction("payer-123", "payee-456", decimal.NewFromFloat(100.00))
+	transaction, _ := entity.NewTransaction("payer-123", "payee-456", decimal.NewFromFloat(100.00))
 	response := transaction.ToCreateTransactionResponse()
 	
 	assert.Equal(t, transaction.ID, response.ID)

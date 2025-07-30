@@ -35,8 +35,8 @@ Este desafio teve como objetivo me tirar da zona de conforto e aplicar conceitos
 - **Go (Golang)** – Linguagem principal da aplicação
 - **Docker** – Containerização do ambiente
 - **Clean Architecture** – Separação clara entre camadas
-- **Gorilla Mux ou Gin** – Framework para rotas HTTP
-- **PostgreSQL / SQLite (opcional)** – Persistência de dados
+- ** Gin** – Framework para rotas HTTP
+- **PostgreSQL** – Persistência de dados
 - **Testify** – Testes unitários e mocks
 - **Go Modules** – Gerenciamento de dependências
 - **Logs estruturados** – Com `logrus` ou `zap`
@@ -51,4 +51,3 @@ Este desafio teve como objetivo me tirar da zona de conforto e aplicar conceitos
 - Toda transação deve ser atômica (rollback em falhas)
 - Notificação e autorização via serviços externos
 
----

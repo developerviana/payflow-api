@@ -165,7 +165,14 @@ func (u *User) isValidCPF() bool {
 	}
 
 	// Verifica se todos os dígitos são iguais
-	if regexp.MustCompile(`^(\d)\1{10}$`).MatchString(cpf) {
+	allSame := true
+	for i := 1; i < len(cpf); i++ {
+		if cpf[i] != cpf[0] {
+			allSame = false
+			break
+		}
+	}
+	if allSame {
 		return false
 	}
 
@@ -210,7 +217,14 @@ func (u *User) isValidCNPJ() bool {
 	}
 
 	// Verifica se todos os dígitos são iguais
-	if regexp.MustCompile(`^(\d)\1{13}$`).MatchString(cnpj) {
+	allSame := true
+	for i := 1; i < len(cnpj); i++ {
+		if cnpj[i] != cnpj[0] {
+			allSame = false
+			break
+		}
+	}
+	if allSame {
 		return false
 	}
 
