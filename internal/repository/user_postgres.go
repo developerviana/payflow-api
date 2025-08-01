@@ -15,14 +15,12 @@ type userPostgresRepository struct {
 	db *database.Database
 }
 
-// NewUserPostgresRepository cria uma nova instância do repositório PostgreSQL
 func NewUserPostgresRepository(db *database.Database) UserRepository {
 	return &userPostgresRepository{
 		db: db,
 	}
 }
 
-// Create cria um novo usuário no banco de dados
 func (r *userPostgresRepository) Create(ctx context.Context, user *entity.User) error {
 	query := `
 		INSERT INTO users (id, full_name, document, email, password, user_type, balance, created_at, updated_at)
@@ -56,7 +54,6 @@ func (r *userPostgresRepository) Create(ctx context.Context, user *entity.User) 
 	return nil
 }
 
-// GetByID busca um usuário por ID
 func (r *userPostgresRepository) GetByID(ctx context.Context, id string) (*entity.User, error) {
 	query := `
 		SELECT id, full_name, document, email, password, user_type, balance, created_at, updated_at
@@ -87,7 +84,6 @@ func (r *userPostgresRepository) GetByID(ctx context.Context, id string) (*entit
 	return user, nil
 }
 
-// GetByEmail busca um usuário por email
 func (r *userPostgresRepository) GetByEmail(ctx context.Context, email string) (*entity.User, error) {
 	query := `
 		SELECT id, full_name, document, email, password, user_type, balance, created_at, updated_at
@@ -118,7 +114,6 @@ func (r *userPostgresRepository) GetByEmail(ctx context.Context, email string) (
 	return user, nil
 }
 
-// GetByDocument busca um usuário por documento
 func (r *userPostgresRepository) GetByDocument(ctx context.Context, document string) (*entity.User, error) {
 	query := `
 		SELECT id, full_name, document, email, password, user_type, balance, created_at, updated_at
@@ -149,7 +144,6 @@ func (r *userPostgresRepository) GetByDocument(ctx context.Context, document str
 	return user, nil
 }
 
-// Update atualiza os dados de um usuário
 func (r *userPostgresRepository) Update(ctx context.Context, user *entity.User) error {
 	query := `
 		UPDATE users 
@@ -180,21 +174,17 @@ func (r *userPostgresRepository) Update(ctx context.Context, user *entity.User) 
 	return nil
 }
 
-// List lista usuários com paginação e filtros
 func (r *userPostgresRepository) List(ctx context.Context, filters *entity.UserFilters) ([]*entity.User, int, error) {
-	// Query para contar total
 	countQuery := "SELECT COUNT(*) FROM users WHERE 1=1"
 	args := []interface{}{}
 	argCount := 0
 
-	// Query principal
 	query := `
 		SELECT id, full_name, document, email, password, user_type, balance, created_at, updated_at
 		FROM users
 		WHERE 1=1
 	`
 
-	// Aplicar filtros
 	if filters.UserType != "" {
 		argCount++
 		countQuery += fmt.Sprintf(" AND user_type = $%d", argCount)
@@ -209,14 +199,12 @@ func (r *userPostgresRepository) List(ctx context.Context, filters *entity.UserF
 		args = append(args, "%"+filters.Email+"%")
 	}
 
-	// Contar total
 	var total int
 	err := r.db.DB.QueryRowContext(ctx, countQuery, args...).Scan(&total)
 	if err != nil {
 		return nil, 0, fmt.Errorf("erro ao contar usuários: %w", err)
 	}
 
-	// Adicionar paginação
 	query += " ORDER BY created_at DESC"
 	argCount++
 	query += fmt.Sprintf(" LIMIT $%d", argCount)
@@ -226,7 +214,6 @@ func (r *userPostgresRepository) List(ctx context.Context, filters *entity.UserF
 	query += fmt.Sprintf(" OFFSET $%d", argCount)
 	args = append(args, filters.Offset())
 
-	// Executar query
 	rows, err := r.db.DB.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, 0, fmt.Errorf("erro ao listar usuários: %w", err)
@@ -256,10 +243,7 @@ func (r *userPostgresRepository) List(ctx context.Context, filters *entity.UserF
 	return users, total, nil
 }
 
-// Delete remove um usuário (soft delete)
 func (r *userPostgresRepository) Delete(ctx context.Context, id string) error {
-	// Por enquanto, implementar como hard delete
-	// Em produção, seria melhor implementar soft delete
 	query := "DELETE FROM users WHERE id = $1"
 
 	result, err := r.db.DB.ExecContext(ctx, query, id)
@@ -279,7 +263,6 @@ func (r *userPostgresRepository) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-// ExistsByEmailOrDocument verifica se um usuário existe por email ou documento
 func (r *userPostgresRepository) ExistsByEmailOrDocument(ctx context.Context, email, document string) (bool, error) {
 	query := "SELECT COUNT(*) FROM users WHERE email = $1 OR document = $2"
 

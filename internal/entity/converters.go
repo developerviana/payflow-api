@@ -1,6 +1,5 @@
 package entity
 
-// ToCreateUserResponse converte User para CreateUserResponse
 func (u *User) ToCreateUserResponse() *CreateUserResponse {
 	return &CreateUserResponse{
 		ID:       u.ID,
@@ -12,7 +11,6 @@ func (u *User) ToCreateUserResponse() *CreateUserResponse {
 	}
 }
 
-// ToGetUserResponse converte User para GetUserResponse
 func (u *User) ToGetUserResponse() *GetUserResponse {
 	return &GetUserResponse{
 		ID:        u.ID,
@@ -26,7 +24,6 @@ func (u *User) ToGetUserResponse() *GetUserResponse {
 	}
 }
 
-// ToUserSummary converte User para UserSummary
 func (u *User) ToUserSummary() *UserSummary {
 	return &UserSummary{
 		ID:       u.ID,
@@ -36,7 +33,6 @@ func (u *User) ToUserSummary() *UserSummary {
 	}
 }
 
-// ToBalanceResponse converte User para BalanceResponse
 func (u *User) ToBalanceResponse() *BalanceResponse {
 	return &BalanceResponse{
 		UserID:    u.ID,
@@ -45,18 +41,16 @@ func (u *User) ToBalanceResponse() *BalanceResponse {
 	}
 }
 
-// maskDocument mascara o documento para exibição
 func (u *User) maskDocument() string {
-	if len(u.Document) == 11 { // CPF
+	if len(u.Document) == 11 {
 		return u.Document[:3] + ".***.***-" + u.Document[9:]
 	}
-	if len(u.Document) == 14 { // CNPJ
+	if len(u.Document) == 14 {
 		return u.Document[:2] + ".***.***/" + u.Document[8:12] + "-" + u.Document[12:]
 	}
 	return u.Document
 }
 
-// ToCreateTransactionResponse converte Transaction para CreateTransactionResponse
 func (t *Transaction) ToCreateTransactionResponse() *CreateTransactionResponse {
 	return &CreateTransactionResponse{
 		ID:         t.ID,
@@ -69,7 +63,6 @@ func (t *Transaction) ToCreateTransactionResponse() *CreateTransactionResponse {
 	}
 }
 
-// ToGetTransactionResponse converte Transaction para GetTransactionResponse
 func (t *Transaction) ToGetTransactionResponse() *GetTransactionResponse {
 	response := &GetTransactionResponse{
 		ID:               t.ID,
@@ -86,7 +79,6 @@ func (t *Transaction) ToGetTransactionResponse() *GetTransactionResponse {
 		CompletedAt:      t.CompletedAt,
 	}
 
-	// Adiciona dados dos usuários se disponíveis
 	if t.Payer != nil {
 		response.Payer = t.Payer.ToUserSummary()
 	}
@@ -97,7 +89,6 @@ func (t *Transaction) ToGetTransactionResponse() *GetTransactionResponse {
 	return response
 }
 
-// FromCreateUserRequest converte CreateUserRequest para User
 func FromCreateUserRequest(req *CreateUserRequest) (*User, error) {
 	return NewUser(
 		req.FullName,
@@ -108,7 +99,6 @@ func FromCreateUserRequest(req *CreateUserRequest) (*User, error) {
 	)
 }
 
-// FromCreateTransactionRequest converte CreateTransactionRequest para Transaction
 func FromCreateTransactionRequest(req *CreateTransactionRequest, payerID string) (*Transaction, error) {
 	return NewTransaction(
 		payerID,
@@ -117,22 +107,20 @@ func FromCreateTransactionRequest(req *CreateTransactionRequest, payerID string)
 	)
 }
 
-// ApplyUpdateUserRequest aplica as alterações do UpdateUserRequest ao User
 func (u *User) ApplyUpdateUserRequest(req *UpdateUserRequest) error {
 	if req.FullName != "" {
 		u.FullName = req.FullName
 	}
-	
+
 	if req.Email != "" {
 		u.Email = req.Email
 	}
-	
-	u.UpdatedAt = u.CreatedAt // time.Now() seria chamado no usecase
-	
+
+	u.UpdatedAt = u.CreatedAt
+
 	return u.Validate()
 }
 
-// NewErrorResponse cria uma nova resposta de erro
 func NewErrorResponse(message, code, details, field string, value interface{}) *ErrorResponse {
 	return &ErrorResponse{
 		Error:   message,
@@ -143,7 +131,6 @@ func NewErrorResponse(message, code, details, field string, value interface{}) *
 	}
 }
 
-// NewSuccessResponse cria uma nova resposta de sucesso
 func NewSuccessResponse(message string, data interface{}) *SuccessResponse {
 	return &SuccessResponse{
 		Message: message,

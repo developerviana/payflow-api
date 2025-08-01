@@ -1,5 +1,5 @@
--- Migration: 002_create_transactions.sql
--- Criação da tabela de transações
+-- Migration: 20240101_000002_create_transactions_table_with_constraints.sql
+-- Criação da tabela de transações com constraints de negócio e índices otimizados
 
 CREATE TABLE IF NOT EXISTS transactions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

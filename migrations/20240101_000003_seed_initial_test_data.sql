@@ -1,5 +1,5 @@
--- Migration: 003_seed_data.sql
--- Dados iniciais para desenvolvimento
+-- Migration: 20240101_000003_seed_initial_test_data.sql
+-- Dados iniciais para desenvolvimento e testes com usuários e transações de exemplo
 
 -- Inserir usuários de exemplo
 INSERT INTO users (id, full_name, document, email, password, user_type, balance) VALUES

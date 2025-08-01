@@ -1,5 +1,5 @@
--- Migration: 001_create_users.sql
--- Criação da tabela de usuários
+-- Migration: 20240101_000001_create_users_table_with_auth.sql
+-- Criação da tabela de usuários com sistema de autenticação e validações
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
