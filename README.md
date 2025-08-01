@@ -237,45 +237,6 @@ go test ./test/unit/... -v
 
 ---
 
-## 📁 Estrutura do Projeto
-
-```
-payflow-api/
-├── cmd/server/              # Ponto de entrada da aplicação
-├── internal/
-│   ├── entity/              # Entidades do domínio
-│   ├── usecase/             # Casos de uso (regras de negócio)
-│   ├── repository/          # Interfaces e implementações de repositório
-│   ├── handler/             # Handlers HTTP (controllers)
-│   └── config/              # Configurações da aplicação
-├── pkg/database/            # Configuração do banco de dados
-├── test/unit/               # Testes unitários
-├── migrations/              # Migrações do banco de dados
-├── docs/                    # Documentação
-├── docker-compose.yml       # Configuração do Docker
-└── Dockerfile              # Imagem Docker da aplicação
-```
-
----
-
-## 🐳 Docker
-
-### **Desenvolvimento (apenas banco)**
-```bash
-docker-compose up postgres -d
-```
-
-### **Produção (aplicação completa)**
-```bash
-docker-compose --profile full up -d
-```
-
-### **Parar containers**
-```bash
-docker-compose down
-```
-
----
 
 ## 🤝 Contribuição
 
