@@ -34,7 +34,7 @@ services:
     networks:
       - payflow-network
     profiles:
-      - full # Use: docker-compose --profile full up
+      - full 
 
 volumes:
   postgres_data:

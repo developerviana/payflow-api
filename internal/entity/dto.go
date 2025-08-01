@@ -1,11 +1,11 @@
 package entity
 
 import (
-	"github.com/shopspring/decimal"
 	"time"
+
+	"github.com/shopspring/decimal"
 )
 
-// CreateUserRequest representa o request para criar um usuário
 type CreateUserRequest struct {
 	FullName string   `json:"full_name" validate:"required,min=3,max=100"`
 	Document string   `json:"document" validate:"required"`
@@ -14,7 +14,6 @@ type CreateUserRequest struct {
 	UserType UserType `json:"user_type" validate:"required,oneof=common merchant"`
 }
 
-// CreateUserResponse representa a resposta da criação de usuário
 type CreateUserResponse struct {
 	ID       string   `json:"id"`
 	FullName string   `json:"full_name"`
@@ -24,7 +23,6 @@ type CreateUserResponse struct {
 	Balance  string   `json:"balance"`
 }
 
-// GetUserResponse representa a resposta de consulta de usuário
 type GetUserResponse struct {
 	ID        string    `json:"id"`
 	FullName  string    `json:"full_name"`
@@ -36,56 +34,49 @@ type GetUserResponse struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-// UpdateUserRequest representa o request para atualizar um usuário
 type UpdateUserRequest struct {
 	FullName string `json:"full_name,omitempty" validate:"omitempty,min=3,max=100"`
 	Email    string `json:"email,omitempty" validate:"omitempty,email"`
 }
 
-// ChangePasswordRequest representa o request para alterar senha
 type ChangePasswordRequest struct {
 	CurrentPassword string `json:"current_password" validate:"required"`
 	NewPassword     string `json:"new_password" validate:"required,min=6"`
 }
 
-// CreateTransactionRequest representa o request para criar uma transação
 type CreateTransactionRequest struct {
 	PayeeID string          `json:"payee_id" validate:"required,uuid"`
 	Amount  decimal.Decimal `json:"amount" validate:"required,gt=0"`
 }
 
-// CreateTransactionResponse representa a resposta da criação de transação
 type CreateTransactionResponse struct {
-	ID              string            `json:"id"`
-	PayerID         string            `json:"payer_id"`
-	PayeeID         string            `json:"payee_id"`
-	Amount          string            `json:"amount"`
-	Status          TransactionStatus `json:"status"`
-	StatusDesc      string            `json:"status_description"`
-	CreatedAt       time.Time         `json:"created_at"`
+	ID         string            `json:"id"`
+	PayerID    string            `json:"payer_id"`
+	PayeeID    string            `json:"payee_id"`
+	Amount     string            `json:"amount"`
+	Status     TransactionStatus `json:"status"`
+	StatusDesc string            `json:"status_description"`
+	CreatedAt  time.Time         `json:"created_at"`
 }
 
-// GetTransactionResponse representa a resposta de consulta de transação
 type GetTransactionResponse struct {
-	ID                string            `json:"id"`
-	PayerID           string            `json:"payer_id"`
-	PayeeID           string            `json:"payee_id"`
-	Amount            string            `json:"amount"`
-	Status            TransactionStatus `json:"status"`
-	StatusDesc        string            `json:"status_description"`
-	AuthorizationID   *string           `json:"authorization_id,omitempty"`
-	NotificationSent  bool              `json:"notification_sent"`
-	FailureReason     *string           `json:"failure_reason,omitempty"`
-	CreatedAt         time.Time         `json:"created_at"`
-	UpdatedAt         time.Time         `json:"updated_at"`
-	CompletedAt       *time.Time        `json:"completed_at,omitempty"`
-	
-	// Dados dos usuários relacionados
+	ID               string            `json:"id"`
+	PayerID          string            `json:"payer_id"`
+	PayeeID          string            `json:"payee_id"`
+	Amount           string            `json:"amount"`
+	Status           TransactionStatus `json:"status"`
+	StatusDesc       string            `json:"status_description"`
+	AuthorizationID  *string           `json:"authorization_id,omitempty"`
+	NotificationSent bool              `json:"notification_sent"`
+	FailureReason    *string           `json:"failure_reason,omitempty"`
+	CreatedAt        time.Time         `json:"created_at"`
+	UpdatedAt        time.Time         `json:"updated_at"`
+	CompletedAt      *time.Time        `json:"completed_at,omitempty"`
+
 	Payer *UserSummary `json:"payer,omitempty"`
 	Payee *UserSummary `json:"payee,omitempty"`
 }
 
-// UserSummary representa um resumo do usuário
 type UserSummary struct {
 	ID       string   `json:"id"`
 	FullName string   `json:"full_name"`
@@ -93,7 +84,6 @@ type UserSummary struct {
 	UserType UserType `json:"user_type"`
 }
 
-// ListTransactionsResponse representa a resposta de listagem de transações
 type ListTransactionsResponse struct {
 	Transactions []GetTransactionResponse `json:"transactions"`
 	Total        int                      `json:"total"`
@@ -102,7 +92,6 @@ type ListTransactionsResponse struct {
 	TotalPages   int                      `json:"total_pages"`
 }
 
-// ListUsersResponse representa a resposta de listagem de usuários
 type ListUsersResponse struct {
 	Users      []GetUserResponse `json:"users"`
 	Total      int               `json:"total"`
@@ -111,14 +100,12 @@ type ListUsersResponse struct {
 	TotalPages int               `json:"total_pages"`
 }
 
-// BalanceResponse representa a resposta de consulta de saldo
 type BalanceResponse struct {
-	UserID    string `json:"user_id"`
-	Balance   string `json:"balance"`
+	UserID    string    `json:"user_id"`
+	Balance   string    `json:"balance"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-// ErrorResponse representa uma resposta de erro padronizada
 type ErrorResponse struct {
 	Error   string      `json:"error"`
 	Code    string      `json:"code,omitempty"`
@@ -127,19 +114,16 @@ type ErrorResponse struct {
 	Value   interface{} `json:"value,omitempty"`
 }
 
-// SuccessResponse representa uma resposta de sucesso padronizada
 type SuccessResponse struct {
 	Message string      `json:"message"`
 	Data    interface{} `json:"data,omitempty"`
 }
 
-// PaginationParams representa os parâmetros de paginação
 type PaginationParams struct {
 	Page  int `json:"page" validate:"min=1"`
 	Limit int `json:"limit" validate:"min=1,max=100"`
 }
 
-// DefaultPagination retorna parâmetros de paginação padrão
 func DefaultPagination() PaginationParams {
 	return PaginationParams{
 		Page:  1,
@@ -147,12 +131,10 @@ func DefaultPagination() PaginationParams {
 	}
 }
 
-// Offset calcula o offset para queries de banco
 func (p PaginationParams) Offset() int {
 	return (p.Page - 1) * p.Limit
 }
 
-// TransactionFilters representa filtros para consulta de transações
 type TransactionFilters struct {
 	PaginationParams
 	UserID    string            `json:"user_id,omitempty"`
@@ -163,7 +145,6 @@ type TransactionFilters struct {
 	MaxAmount *decimal.Decimal  `json:"max_amount,omitempty"`
 }
 
-// UserFilters representa filtros para consulta de usuários
 type UserFilters struct {
 	PaginationParams
 	UserType UserType `json:"user_type,omitempty"`
