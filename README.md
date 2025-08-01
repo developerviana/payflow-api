@@ -216,13 +216,10 @@ curl http://localhost:8080/api/v1/users/550e8400-e29b-41d4-a716-446655440001/bal
 
 ## 🧪 Testes
 
-```bash
-
 go test ./test/unit/... -v
 
-
-
 ---
+
 
 ## 🔐 Regras de Negócio
 
